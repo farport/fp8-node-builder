@@ -1,26 +1,16 @@
 FROM farport/fp8-alpine-node:8.14
 
-ARG userId
-ARG groupId
-ARG FP8USER=fp8user
+ARG GIT_PROJ_URL
 
 # Add the necessary file from host
-ADD create_fp8user.sh /bin/
-ADD ssh.config /data/ssh/config
-ADD build/id_git_rsa.key /data/ssh/id_git_rsa.key
+ADD ssh.config /root/.ssh/config
+ADD build/id_git_rsa.key /root/.ssh/id_git_rsa.key
 
 # Create fp8user:fp8group using the provided ids
-RUN FP8USER=$(/bin/create_fp8user.sh ${userId} ${groupId}) \
-    && mkdir /output \
-    && chown -R ${FP8USER} /output \
-    && chown -R ${FP8USER} /data \
-    && mkdir -p /home/${FP8USER}/.ssh \
-    && cp /data/ssh/* /home/${FP8USER}/.ssh/ \
-    && ssh-keyscan gitlab.com > /home/${FP8USER}/.ssh/known_hosts \
-    && ssh-keyscan github.com >> /home/${FP8USER}/.ssh/known_hosts \
-    && chown -R ${FP8USER} /home/$FP8USER/ \
-    && chmod 400 /home/${FP8USER}/.ssh/config
+RUN chmod 500 /root/.ssh \
+    && chmod 400 /root/.ssh/* \
+    && ssh-keyscan gitlab.com > /root/.ssh/known_hosts \
+    && ssh-keyscan github.com >> /root/.ssh/known_hosts \
+    && git clone ${GIT_PROJ_URL} /proj
 
-EXPOSE 8000 8080 8100 8200 8300 8400 8500 8600 8700 8800 8900
-
-VOLUME [ "/output", "/data" ]
+EXPOSE 8000 8080 8800

@@ -18,8 +18,7 @@ DOCKER_INST_ID        = $(shell docker ps -aqf"name=$(DOCKER_INST_NAME)")
 DOCKER_IMAGE_ID       = $(shell docker images -qf"reference=$(DOCKER_IMAGE)")
 DOCKER_BUILD_CHECK   := $(BUILD_DIR)/docker.built
 
-CURR_USER_ID         := $(shell id -u ${USER})
-CURR_GROUP_ID        := $(shell id -g ${USER})
+GIT_PROJ_URL          = $(shell cd ..; git config --get remote.origin.url)
 
 # ------------------
 # USAGE: First target called if no target specified
@@ -43,10 +42,12 @@ $(DOCKER_BUILD_CHECK) : $(SSH_KEY_FILE)
 ifeq ($(shell which docker),)
 	$(error docker command needed to be installed.)
 endif
-	@echo "- Building $(DOCKER_IMAGE) image"
+ifeq ($(GIT_PROJ_URL),)
+	$(error active git project not found from parent directory)
+endif
+	@echo "- Building $(DOCKER_IMAGE) image for $(GIT_PROJ_URL)"
 	docker build \
-		--build-arg userId=$(CURR_USER_ID) \
-		--build-arg groupId=$(CURR_GROUP_ID) \
+		--build-arg GIT_PROJ_URL=$(GIT_PROJ_URL) \
 		-f Dockerfile -t $(DOCKER_IMAGE) .
 	touch $@
 
@@ -55,14 +56,6 @@ setup : $(DOCKER_BUILD_CHECK)
 connect : $(DOCKER_BUILD_CHECK)
 	@echo "- Connecting to $(DOCKER_IMAGE) docker image"
 	@docker run --rm \
-		-v $(BUILD_DIR):/output \
-		-u $(CURR_USER_ID):$(CURR_GROUP_ID) \
-		--name $(DOCKER_INST_NAME) -it $(DOCKER_IMAGE) /bin/sh
-
-connect-root : $(DOCKER_BUILD_CHECK)
-	@echo "- Connecting to $(DOCKER_IMAGE) docker image"
-	@docker run --rm \
-		-v $(BUILD_DIR):/output \
 		--name $(DOCKER_INST_NAME) -it $(DOCKER_IMAGE) /bin/sh
 
 clean :

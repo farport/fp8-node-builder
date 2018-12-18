@@ -1,6 +1,18 @@
 #!/bin/sh
 
-# Create user or group if not already exists
+# ===========================================================
+# Author:   Marcos Lin
+# Created:  18 Dec 2018
+#
+# Script used to create user with given userId and groupId.
+#
+# If id provided already exists, use it or default to:
+# - user:  fp8user
+# - group: fp8group
+#
+# Returns the name of the username create or existing.
+#
+# ===========================================================
 
 userId=$1
 groupId=$2

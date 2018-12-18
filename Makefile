@@ -8,67 +8,57 @@
 #
 # ===========================================================
 
-ROOT_DIR             := $(shell pwd)
-BUILD_DIR            := $(ROOT_DIR)/build
-SSH_KEY_FILE         := $(BUILD_DIR)/id_git_rsa.key
+ROOT_DIR           := $(shell pwd)
+BUILD_DIR          := $(ROOT_DIR)/build
 
-DOCKER_IMAGE         := $(shell basename $(shell pwd))
-DOCKER_INST_NAME     := $(DOCKER_IMAGE)-inst
-DOCKER_INST_ID        = $(shell docker ps -aqf"name=$(DOCKER_INST_NAME)")
-DOCKER_IMAGE_ID       = $(shell docker images -qf"reference=$(DOCKER_IMAGE)")
-DOCKER_BUILD_CHECK   := $(BUILD_DIR)/docker.built
+IMAGE_BASE         := $(shell basename $(ROOT_DIR))
+IMAGE_VERSION      := 8.14.0
+IMAGE_NAME         := farport/$(IMAGE_BASE):$(IMAGE_VERSION)
+CONTAINER_NAME     := $(IMAGE_BASE)-inst
+IMAGE_BUILD_CHECK  := $(BUILD_DIR)/docker.built
 
-CUR_USER_ID          := $(shell id -u ${USER})
-CUR_GROUP_ID         := $(shell id -g ${USER})
+CUR_USER_ID        := $(shell id -u ${USER})
+CUR_GROUP_ID       := $(shell id -g ${USER})
+
+IMAGE_ID            = $(shell docker images -qf"reference=$(IMAGE_NAME)")
+CONTAINER_ID        = $(shell docker ps -aqf"name=$(CONTAINER_NAME)")
 
 # ------------------
 # USAGE: First target called if no target specified
 man :
 	@cat README.md
 
-
 # ------------------
 # MAIN TARGETS
 $(BUILD_DIR) :
 	mkdir -p $@
-
-$(SSH_KEY_FILE) : $(BUILD_DIR)
-ifeq (${FP8_GIT_SSHKEY},)
-	$(error FP8_GIT_SSHKEY env must exist pointing to a ssh key that can access git repo.)
-endif
-	@echo "- Copying ${FP8_GIT_SSHKEY} file"
-	@cp ${FP8_GIT_SSHKEY} $@
 	
-$(DOCKER_BUILD_CHECK) : $(SSH_KEY_FILE)
+$(IMAGE_BUILD_CHECK) : $(BUILD_DIR)
 ifeq ($(shell which docker),)
 	$(error docker command needed to be installed.)
 endif
-	@echo "- Building $(DOCKER_IMAGE) image for $(GIT_PROJ_URL)"
+	@echo "- Building $(IMAGE_NAME)"
 	docker build \
-		--build-arg userId=$(CUR_USER_ID) \
-		--build-arg groupId=$(CUR_GROUP_ID) \
-		-f Dockerfile -t $(DOCKER_IMAGE) .
+		-f Dockerfile -t $(IMAGE_NAME) .
 	touch $@
 
-setup : $(DOCKER_BUILD_CHECK)
+setup : $(IMAGE_BUILD_CHECK)
 
-connect : $(DOCKER_BUILD_CHECK)
+connect : $(IMAGE_BUILD_CHECK)
 	@echo "- Connecting to $(DOCKER_IMAGE) docker image"
-	@docker run --rm \
-		-u $(CUR_USER_ID):$(CUR_GROUP_ID) \
-		--name $(DOCKER_INST_NAME) -it $(DOCKER_IMAGE) /bin/sh
+	@docker run \
+		--name $(CONTAINER_NAME) -it $(IMAGE_NAME) /bin/sh
 
 clean :
-ifneq ($(DOCKER_INST_ID),)
-	@echo "### Removing docker instance $(DOCKER_INST_ID)"
-	@docker rm $(DOCKER_INST_ID)
+ifneq ($(CONTAINER_ID),)
+	@echo "### Removing docker container $(CONTAINER_ID)"
+	@docker rm $(CONTAINER_ID)
 endif
-ifneq ($(DOCKER_IMAGE_ID),)
-	@echo "### Removing docker image $(DOCKER_IMAGE_ID)"
-	@docker rmi $(DOCKER_IMAGE_ID)
+ifneq ($(IMAGE_ID),)
+	@echo "### Removing docker image $(IMAGE_ID)"
+	@docker rmi $(IMAGE_ID)
 endif
 	rm -rf $(BUILD_DIR)
-
 
 # ------------------
 # DEFINE PHONY TARGET: Basically all targets

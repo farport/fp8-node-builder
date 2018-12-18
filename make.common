@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# ===========================================================
+# Author:   Marcos Lin
+# Created:  14 Dec 2018
+#
+# Common file for all Makefiles in this project
+# ===========================================================
+
+# ------------------
+# Variables
+ROOT_DIR        := $(shell pwd)
+BUILD_DIR       := $(ROOT_DIR)/build
+
+CUR_USER_ID     := $(shell id -u ${USER})
+CUR_GROUP_ID    := $(shell id -g ${USER})
+
+RUN_MAKE        := $(MAKE) --no-builtin-rules -f 
+
+# ------------------
+# Directories
+$(BUILD_DIR) :
+	mkdir -p $@

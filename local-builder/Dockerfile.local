@@ -14,8 +14,7 @@ RUN FP8USER=$(/bin/create_fp8user.sh ${userId} ${groupId}) \
     && cp /root/.ssh/* $USERHOME/.ssh/ \
     && chmod 700 $USERHOME/.ssh \
     && chown -R ${FP8USER} $USERHOME/.ssh/ \
-    && chown -R ${FP8USER} /proj
-
-# && su ${FP8USER} -c 'yarn config set cache-folder /var/cache/yarn'
+    && chown -R ${FP8USER} /proj \
+    && su ${FP8USER} -c 'yarn config set cache-folder /var/cache/yarn'
 
 VOLUME [ "/proj" ]

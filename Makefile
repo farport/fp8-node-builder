@@ -11,7 +11,7 @@
 include make.common
 
 IMAGE_BASE         := $(shell basename $(ROOT_DIR))
-IMAGE_VERSION      := 8.14.0
+IMAGE_VERSION      := 8.14.1
 IMAGE_NAME         := farport/$(IMAGE_BASE):$(IMAGE_VERSION)
 CONTAINER_NAME     := $(IMAGE_BASE)-inst
 IMAGE_BUILD_CHECK  := $(BUILD_DIR)/docker.built

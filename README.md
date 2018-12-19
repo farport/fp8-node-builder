@@ -12,3 +12,6 @@ A docker image to build node based project.
 * `make setup`:   build docker image
 * `make connect`: connect to image using `sh`
 
+## Local Builder
+
+* `make setup-local`:   create developer specific local builder

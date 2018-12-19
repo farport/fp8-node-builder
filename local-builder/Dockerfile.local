@@ -1,4 +1,4 @@
-FROM farport/fp8-node-builder:8.14.0
+FROM farport/fp8-node-builder:8.14
 
 ARG userId
 ARG groupId
@@ -16,8 +16,6 @@ RUN FP8USER=$(/bin/create_fp8user.sh ${userId} ${groupId}) \
     && chown -R ${FP8USER} $USERHOME/.ssh/ \
     && chown -R ${FP8USER} /proj
 
-USER ${FP8USER}
-
-RUN yarn config set cache-folder /var/cache/yarn
+# && su ${FP8USER} -c 'yarn config set cache-folder /var/cache/yarn'
 
 VOLUME [ "/proj" ]

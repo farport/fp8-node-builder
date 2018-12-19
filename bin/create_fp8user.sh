@@ -30,7 +30,7 @@ fi
 userName=$(getent passwd $userId | cut -d: -f 1)
 if [ -z "$userName" ]; then
     userName=fp8user
-    adduser -u $userId -G $groupName -D $userName
+    adduser -u $userId -G $groupName -s /bin/sh -D $userName 
 fi
 
 # output the username

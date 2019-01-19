@@ -1,5 +1,9 @@
 FROM node:8.14.0-alpine
 
+LABEL maintainer="Marcos Lin <marcos.lin@farport.co>" \
+	"app.fp8.docker.version.node"="8.14.0" \
+	"app.fp8.docker.version.yarn"="1.12.3"
+
 # Add the necessary file from host
 ADD bin/* /bin/
 

@@ -15,7 +15,7 @@ A docker image to build node based project.
 
 ## Local Builder
 
-* `make setup-local`:   create developer specific local builder
+* `cd node-builder-local; make setup`:   create developer specific local builder
 
 ## Release
 

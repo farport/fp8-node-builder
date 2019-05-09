@@ -20,6 +20,9 @@ DOCKER_RUN_OPTIONS   := --rm \
 	-u $(CUR_USER_ID):$(CUR_GROUP_ID) \
 	-v $(YARN_CACHE):/var/cache/yarn
 
+# This version should be kept in sync with ../Makefile
+IMAGE_VERSION := 8.14.2
+
 connect-root : $(IMAGE_BUILD_CHECK)
 	@echo "- Creating $(CONTAINER_NAME) from $(IMAGE_NAME)"
 	@docker run --rm \

@@ -1,5 +1,10 @@
 ## Relase History
 
+#### 16.12.0 [14 Jan 2020]
+
+* Create the version with `node:16.12.0-alpine3.14` as base image
+* `python` package no longer exists in apline3.14; replaced with `python1`
+
 #### 10.15.0 [14 Jan 2020]
 
 * Create the version with `node:10.15.3-alpine` as base image
